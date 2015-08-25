@@ -1,0 +1,74 @@
+<?xml version="1.0" standalone="yes"?>
+<!--
+  Compile the JCalendar classes.
+  Don Corley <don@donandann.com>
+-->
+<project basedir="." default="dist">
+	<property file="build.properties">
+	</property>
+	<property file="mybuild.properties">
+	</property>
+
+	<target name="clean">
+		<delete dir="${build}">
+		</delete>
+		<delete dir="${lib}">
+		</delete>
+	</target>
+
+	<target name="prepare">
+		<tstamp>
+		</tstamp>
+		<mkdir dir="${build}">
+		</mkdir>
+		<mkdir dir="${temp}">
+		</mkdir>
+		<mkdir dir="${dist}">
+		</mkdir>
+		<mkdir dir="${classes}">
+		</mkdir>
+		<mkdir dir="${lib}">
+		</mkdir>
+		<mkdir dir="${docs}">
+		</mkdir>
+	</target>
+
+	<target name="compile" depends="prepare">
+		<javac debug="${debug}" destdir="${classes}" srcdir="${src}">
+			<classpath>
+				<pathelement path="${project.class.path}">
+				</pathelement>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="dist" depends="compile">
+	    <copy todir="${temp}">
+	      <fileset dir="${classes}">
+	        <include name="**" />
+	      </fileset>
+	    </copy>
+	    <copy todir="${temp}">
+	      <fileset dir=".">
+	        <include name="images/buttons/**" />
+	      </fileset>
+	    </copy>
+
+		<delete dir="${lib}" />
+	    <mkdir dir="${lib}" />
+		<jar jarfile="${lib}/${project}.jar">
+			<fileset includes="**" dir="${classes}">
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="package" depends="dist" description="Put together the source distribution">
+        <zip zipfile="${dist}/${project}${version}.zip">
+ 			<fileset dir=".." 
+				includes="${project}/**"
+				excludes="${project}/${build}/**,**/.**"/>
+        </zip>
+	</target>
+
+</project>
+

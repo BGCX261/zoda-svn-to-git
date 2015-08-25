@@ -1,0 +1,149 @@
+#labels maven,quickreview
+= Introduction =
+In order to create a new maven project called MyProject run the following command:
+
+{{{
+mvn archetype:create -DgroupId=fs.work -DartifactId=MyProject
+}}}
+
+This will create a new directory called *MyProject* with a *pom.xml* and the following tree structure:
+{{{
+MyProject
+ |-->pom.xml
+ |-->src
+ |  |-->main
+ |  |  |-->java
+ |  |  |  |-->fs
+ |  |  |  |  |-->work
+ |  |  |  |  |  |-->App.java
+ |  |-->test
+ |  |  |-->java
+ |  |  |  |-->fs
+ |  |  |  |  |-->work
+ |  |  |  |  |  |-->AppTest.java
+}}}
+The pom file looks like this:
+{{{
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fs.work</groupId>
+  <artifactId>MyProject</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>MyProject</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+     <dependency>
+	<groupId>junit</groupId>
+	<artifactId>junit</artifactId>
+	<version>3.8.1</version>
+	<scope>test</scope>
+     </dependency>  
+  </dependencies>
+}}}
+= Creating sub-modules =
+If you need to create sub-modules within your project, you need to change the packaging in the pom file (i.e. the "super" pom), to pom. Then, from within the MyProject directory issue the following commands to create sub-modules:
+{{{
+mvn archetype:create -DgroupId=fs.work -DartifactId=MyProjectWeb -Dpackaging=war
+---
+mvn archetype:create -DgroupId=fs.work -DartifactId=MyProjectModule1 -Dpackaging=jar
+}}}
+This creates the sub-modules and the directory tree now looks like this:
+{{{
+MyProject
+ |-->pom.xml
+ |-->src
+ |  |-->main
+ |  |  |-->java
+ |  |  |  |-->fs
+ |  |  |  |  |-->work
+ |  |  |  |  |  |-->App.java
+ |  |-->test
+ |  |  |-->java
+ |  |  |  |-->fs
+ |  |  |  |  |-->work
+ |  |  |  |  |  |-->AppTest.java
+ |-->MyProjectModule1
+ |  |-->pom.xml
+ |  |-->src
+ |  |  |-->main
+ |  |  |  |-->java
+ |  |  |  |  |-->fs
+ |  |  |  |  |  |-->work
+ |  |  |  |  |  |  |-->App.java
+ |  |  |-->test
+ |  |  |  |-->java
+ |  |  |  |  |-->fs
+ |  |  |  |  |  |-->work
+ |  |  |  |  |  |  |-->AppTest.java
+ |-->MyProjectWeb
+ |  |-->pom.xml
+ |  |-->src
+ |  |  |-->main
+ |  |  |  |-->java
+ |  |  |  |  |-->fs
+ |  |  |  |  |  |-->work
+ |  |  |  |  |  |  |-->App.java
+ |  |  |-->test
+ |  |  |  |-->java
+ |  |  |  |  |-->fs
+ |  |  |  |  |  |-->work
+ |  |  |  |  |  |  |-->AppTest.java
+}}}
+The pom file for MyProjectModule1 contains a reference to the parent and looks like this:
+{{{
+...
+  <parent>
+    <groupId>fs.work</groupId>
+    <artifactId>MyProject</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent> 
+  <modules>
+    <module>MyProjectModule1</module>
+    <module>MyProjectModule2</module> 
+  </modules>
+...
+}}}
+
+= Deploying a jar to the repository =
+If you have a jar file called myarchive.jar which you want to upload to your maven repository, use the following command:
+{{{
+mvn deploy:deploy-file -Durl=scp://hostname/dir/to/maven -DrepositoryId=fs.repo -Dfile=myarchive.jar -DgroupId=fs.work -DartifactId=myarchive -Dversion=1.0 -Dpackaging=jar
+}}}
+
+This will create *dir/to/maven/fs/work/myarchive/1.0/myarchive-1.0.jar* in the maven repository.
+
+= Creating a dependency =
+To create a dependency on myarchive.jar, add the following dependency to your pom:
+{{{
+  fs.work
+  myarchive
+  1.0
+}}}
+= Generating Eclipse .project and .classpath files =
+Use the following command:
+
+{{{
+mvn eclipse:eclipse
+}}}
+
+=Skipping tests=
+To skip tests use the property maven.test.skip=true.
+{{{
+mvn -Dmaven.test.skip=true install
+}}}
+= Release a project =
+Two commands must be invoked, in the following order:
+{{{
+mvn release:prepare
+mvn release:perform
+}}}
+= Other commands =
+{{{
+mvn install
+mvn clean
+mvn compile
+mvn jar:jar
+}}}
